@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Storage To-Do List</title>
+    <style>
+        /* Estilização (CSS) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .content {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Botão de Remoção de Tarefa */
+        button.remove-task {
+            background-color: #ff3d3d;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        button.remove-task:hover {
+            background-color: #d60d0d;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>To-Do List</h1>
+
+        <input type="text" id="task" placeholder="Digite uma tarefa">
+        <button onclick="saveTask()">Salvar Tarefa</button>
+
+        <ul id="task-list">
+            <!-- Tarefas serão adicionadas aqui -->
+        </ul>
+    </div>
+
+    <script>
+        // Função para salvar uma tarefa no Local Storage
+        function saveTask() {
+            const taskInput = document.getElementById('task');
+            const task = taskInput.value;
+
+            if (task) {
+                // Verifica se o Local Storage está disponível no navegador
+                if (typeof(Storage) !== "undefined") {
+                    // Recupera as tarefas existentes do Local Storage
+                    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                    
+                    // Adiciona a nova tarefa à lista de tarefas
+                    tasks.push(task);
+
+                    // Salva a lista atualizada de tarefas no Local Storage
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+
+                    // Limpa o campo de entrada
+                    taskInput.value = '';
+
+                    // Atualiza a exibição da lista de tarefas
+                    displayTasks();
+                } else {
+                    alert("Local Storage não suportado neste navegador.");
+                }
+            }
+        }
+
+        // Função para exibir tarefas do Local Storage
+        function displayTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = ''; // Limpa a lista
+
+            // Recupera as tarefas do Local Storage
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            // Exibe as tarefas na lista
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.textContent = task;
+                const removeButton = document.createElement('button');
+                removeButton.className = "remove-task";
+                removeButton.textContent = "Remover";
+                removeButton.addEventListener('click', function() {
+                    removeTask(index);
+                });
+                li.appendChild(removeButton);
+                taskList.appendChild(li);
+            });
+        }
+
+        // Função para remover uma tarefa do Local Storage
+        function removeTask(index) {
+            if (typeof(Storage) !== "undefined") {
+                let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                tasks.splice(index, 1); // Remove a tarefa da lista
+                localStorage.setItem('tasks', JSON.stringify(tasks)); // Atualiza o Local Storage
+                displayTasks(); // Atualiza a exibição da lista
+            }
+        }
+
+        // Chama a função para exibir tarefas ao carregar a página
+        displayTasks();
+    </script>
+</body>
+</html>
